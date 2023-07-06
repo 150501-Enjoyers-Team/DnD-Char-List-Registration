@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unigroup</groupId>
-	<artifactId>dndcharlist</artifactId>
+	<artifactId>dndcharlistreg</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>dndcharlist</name>
 	<description>DND Character List Service</description>
@@ -50,6 +50,11 @@
 			<groupId>org.springframework.amqp</groupId>
 			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.6.0</version>
 		</dependency>
 	</dependencies>
 
