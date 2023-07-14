@@ -1,30 +1,21 @@
 package com.unigroup.dndcharlist.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Set;
 
-@Data
 @Entity
-public class Role implements GrantedAuthority {
+@Data
+@Table(name = "roles")
+public class Role {
     @Id
-    private Long id;
-    private String name;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
-    @Override
-    public String getAuthority() {
-        return null;
-    }
-    public Role(Long id, String name)
-    {
-        this.id = id;
-        this.name = name;
-    }
+    @Column(name = "name")
+    private String name;
 }

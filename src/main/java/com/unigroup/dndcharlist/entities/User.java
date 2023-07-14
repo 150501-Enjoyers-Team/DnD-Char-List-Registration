@@ -1,54 +1,42 @@
 package com.unigroup.dndcharlist.entities;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 
 
-@Data
 @Entity
-@Table(name = "userinfo")
-public class User implements UserDetails {
-    private String name;
-    private String password;
-
+@Data
+@Table(name = "users")
+public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles;
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-    }
+    @Column(name = "user_id")
+    private UUID userId;
 
-    @Override
-    public String getUsername() {
-        return name;
-    }
+    @Column(name = "username")
+    private String username;
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    @Column(name = "password")
+    private String password;
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    @Column(name = "email")
+    private String email;
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Collection<Role> roles;
 }
