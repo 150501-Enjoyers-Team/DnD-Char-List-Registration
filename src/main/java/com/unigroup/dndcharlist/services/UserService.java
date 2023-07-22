@@ -1,6 +1,7 @@
 package com.unigroup.dndcharlist.services;
 
 import com.unigroup.dndcharlist.dtos.RegistrationUserDto;
+import com.unigroup.dndcharlist.dtos.UserDto;
 import com.unigroup.dndcharlist.entities.User;
 import com.unigroup.dndcharlist.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -57,11 +58,16 @@ public class UserService implements UserDetailsService {
 
     public User createNewUser(RegistrationUserDto registrationUserDto) {
         User user = new User();
-        user.setUserId(UUID.randomUUID());
         user.setUsername(registrationUserDto.getUsername());
         user.setEmail(registrationUserDto.getEmail());
         user.setPassword(passwordEncoder.encode(registrationUserDto.getPassword()));
         user.setRoles(List.of(roleService.getUserRole()));
         return userRepository.save(user);
     }
+
+//    public UserDto findUserByUsername(String username) {
+//
+//        UserDto userDto = UserDto.builder()
+//                .build();
+//    }
 }

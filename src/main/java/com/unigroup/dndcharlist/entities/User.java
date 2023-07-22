@@ -20,9 +20,6 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id")
-    private UUID userId;
-
     @Column(name = "username")
     private String username;
 
