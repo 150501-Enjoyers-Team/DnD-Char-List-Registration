@@ -16,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,6 +38,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 log.debug("Время жизни токена вышло");
             } catch (SignatureException e) {
                 log.debug("Подпись неправильная");
+            } catch (GeneralSecurityException e) {
+                throw new RuntimeException(e);
             }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
