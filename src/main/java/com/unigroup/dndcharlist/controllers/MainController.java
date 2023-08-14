@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Optional;
 
 import static com.unigroup.dndcharlist.mapper.UserDataMapper.mapToUserDataResponse;
 
@@ -38,7 +39,14 @@ public class MainController {
 
     @GetMapping("/info")
     public ResponseEntity<UserDataResponse> userData(Principal principal) {
-//        return principal.getName();
-        return ResponseEntity.ok(mapToUserDataResponse(userService.findByUsername(principal.getName()).get()));
+        Optional<User> optionalUser = userService.findByUsername(principal.getName());
+        if (optionalUser.isEmpty())
+        {
+            UserDataResponse user = new UserDataResponse();
+            user.setUsername(principal.getName());
+            user.setEmail(principal.getName());
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.ok(mapToUserDataResponse(optionalUser.get()));
     }
 }

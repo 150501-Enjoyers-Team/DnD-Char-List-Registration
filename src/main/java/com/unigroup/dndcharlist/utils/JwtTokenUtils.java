@@ -5,6 +5,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,7 +62,9 @@ public class JwtTokenUtils {
     }
 
     public List<String> getRoles(String token) {
-        return getAllClaimsFromOurJwt(token).get("roles", List.class);
+        Object roleArray = getAllClaimsFromToken(token).get("roles");
+        if (roleArray == null) return Collections.singletonList("ROLE_USER");
+        return ((JSONArray) roleArray).toList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     public String getIssuer(String token) {
