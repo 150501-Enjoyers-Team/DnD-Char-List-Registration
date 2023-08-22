@@ -51,7 +51,6 @@ public class KeyLocator implements SigningKeyResolver {
             }
             case "https://accounts.google.com" -> {
                 return googleKeyKeeper.getPublicKey(jwsHeader.getKeyId());
-
             }
         }
         return null;

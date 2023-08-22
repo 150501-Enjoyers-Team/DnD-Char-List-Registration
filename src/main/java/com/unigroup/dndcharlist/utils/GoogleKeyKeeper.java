@@ -1,5 +1,6 @@
 package com.unigroup.dndcharlist.utils;
 
+import com.unigroup.dndcharlist.mapper.JwkMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ public class GoogleKeyKeeper {
 
     public PublicKey getPublicKey(String kid)
     {
-        return googleJwkKeys.stream().filter(key -> key.get("kid").equals(kid)).map(key -> getPublicKeyFromJwk(key)).findFirst().orElse(null);
+        return googleJwkKeys.stream().filter(key -> key.get("kid").equals(kid)).map(key -> JwkMapper.mapToRSAPublicKey(key)).findFirst().orElse(null);
     }
     public long getDelay()
     {
@@ -50,22 +51,5 @@ public class GoogleKeyKeeper {
                 .findFirst()
                 .get();
 
-    }
-
-    private PublicKey getPublicKeyFromJwk(HashMap<String, String> jwkKey){
-
-        Base64 decoder = new Base64(true);
-        BigInteger mod = new BigInteger(1, decoder.decode(jwkKey.get("n")));
-        BigInteger exp = new BigInteger(1, decoder.decode(jwkKey.get("e")));
-
-        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod, exp);
-        PublicKey publicKey = null;
-        try {
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            publicKey = kf.generatePublic(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            return null;
-        }
-        return publicKey;
     }
 }
