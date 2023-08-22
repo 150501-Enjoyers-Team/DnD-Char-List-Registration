@@ -1,18 +1,32 @@
 package com.unigroup.dndcharlist.controllers;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GooglePublicKeysManager;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.unigroup.dndcharlist.dtos.UserDataResponse;
-import com.unigroup.dndcharlist.dtos.UserDto;
 import com.unigroup.dndcharlist.entities.User;
 import com.unigroup.dndcharlist.services.UserService;
+import com.unigroup.dndcharlist.utils.GoogleKeyKeeper;
+import com.unigroup.dndcharlist.utils.KeyLocator;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.Principal;
+import java.security.PublicKey;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static com.unigroup.dndcharlist.mapper.UserDataMapper.mapToUserDataResponse;
 
@@ -23,7 +37,8 @@ public class MainController {
     private final UserService userService;
 
     @GetMapping("/unsecured")
-    public String unsecuredData() {
+    public String unsecuredData(String token) {
+
         return "Unsecured data";
     }
 

@@ -1,12 +1,15 @@
 package com.unigroup.dndcharlist.utils;
 
+import com.google.api.client.googleapis.auth.oauth2.GooglePublicKeysManager;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,16 +19,29 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtils {
-    @Value("984hg493gh0439rthr0429uruj2309yh937gc763fe87t3f89723gf")
-    private String secret;
+
+
+    private KeyLocator keyLocator;
+    private JwtParser jwtParser;
+
+    @Autowired
+    public JwtTokenUtils(KeyLocator locator)
+    {
+        keyLocator = locator;
+        jwtParser = Jwts.parserBuilder()
+                .setSigningKeyResolver(keyLocator)
+                .build();
+    }
 
     @Value("30m")
     private Duration jwtLifetime;
@@ -44,10 +60,11 @@ public class JwtTokenUtils {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(new SecretKeySpec(keyLocator.getOwnSecret().getBytes(), "HmacSHA256"))
                 .setIssuer(issuer)
                 .compact();
     }
+
 
     public String getGoogleUsername(String token) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
@@ -62,34 +79,35 @@ public class JwtTokenUtils {
     }
 
     public List<String> getRoles(String token) {
-        Object roleArray = getAllClaimsFromToken(token).get("roles");
+        Object roleArray = getAllClaimsFromJwt(token).get("roles");
         if (roleArray == null) return Collections.singletonList("ROLE_USER");
         return ((JSONArray) roleArray).toList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     public String getIssuer(String token) {
-        return getAllClaimsFromToken(token).get("iss").toString();
+        return getAllClaimsFromJwt(token).get("iss").toString();
     }
 
     public String getUsername(String token) throws GeneralSecurityException, IOException {
-        String username = null;
+        Claims claims = getAllClaimsFromJwt(token);
         String issuer = getIssuer(token);
+        String username = null;
         if (issuer.equals("150501")) {
-            username = getAllClaimsFromOurJwt(token).getSubject();
+            username = claims.getSubject();
         } else if (issuer.equals("https://accounts.google.com")) {
-            username = getGoogleUsername(token);
+            username = (String) claims.get("email");
         }
+
         return username;
     }
 
-    public Claims getAllClaimsFromOurJwt(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
+    public Claims getAllClaimsFromJwt(String token) {
+        return jwtParser
                 .parseClaimsJws(token)
                 .getBody();
     }
 
-    public Map<String, Object> convertJsonStringToMap(String jsonString) {
+/*    public Map<String, Object> convertJsonStringToMap(String jsonString) {
         JSONObject jsonObject = new JSONObject(jsonString);
         Map<String, Object> map = new HashMap<>();
         for (String key : jsonObject.keySet()) {
@@ -105,5 +123,5 @@ public class JwtTokenUtils {
         String decoded = new String(decoder.decode(parts[1]));
         Map<String, Object> map = convertJsonStringToMap(decoded);
         return map;
-    }
+    }*/
 }
