@@ -1,7 +1,6 @@
 package com.unigroup.dndcharlist.services;
 
 import com.unigroup.dndcharlist.dtos.RegistrationUserDto;
-import com.unigroup.dndcharlist.dtos.UserDto;
 import com.unigroup.dndcharlist.entities.User;
 import com.unigroup.dndcharlist.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -15,11 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
+
     private UserRepository userRepository;
     private RoleService roleService;
     private PasswordEncoder passwordEncoder;
@@ -64,10 +63,4 @@ public class UserService implements UserDetailsService {
         user.setRoles(List.of(roleService.getUserRole()));
         return userRepository.save(user);
     }
-
-//    public UserDto findUserByUsername(String username) {
-//
-//        UserDto userDto = UserDto.builder()
-//                .build();
-//    }
 }

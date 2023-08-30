@@ -28,13 +28,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtTokenUtils {
 
-
     private KeyLocator keyLocator;
     private JwtParser jwtParser;
 
     @Autowired
-    public JwtTokenUtils(KeyLocator locator)
-    {
+    public JwtTokenUtils(KeyLocator locator) {
         keyLocator = locator;
         jwtParser = Jwts.parserBuilder()
                 .setSigningKeyResolver(keyLocator)
@@ -118,8 +116,9 @@ public class JwtTokenUtils {
                 .getBody();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) throws GeneralSecurityException, IOException {
-        final String username = getUsername(token);
+    public boolean isTokenValid(String token, UserDetails userDetails)
+            throws GeneralSecurityException {
+        String username = getUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
@@ -141,22 +140,4 @@ public class JwtTokenUtils {
         if (roleArray == null) return Collections.singletonList("ROLE_USER");
         else return roleArray;
     }
-
-/*    public Map<String, Object> convertJsonStringToMap(String jsonString) {
-        JSONObject jsonObject = new JSONObject(jsonString);
-        Map<String, Object> map = new HashMap<>();
-        for (String key : jsonObject.keySet()) {
-            Object value = jsonObject.get(key);
-            map.put(key, value);
-        }
-        return map;
-    }
-
-    private Map<String, Object> getAllClaimsFromToken(String token) {
-        String[] parts = token.split("\\.");
-        Base64.Decoder decoder = Base64.getDecoder();
-        String decoded = new String(decoder.decode(parts[1]));
-        Map<String, Object> map = convertJsonStringToMap(decoded);
-        return map;
-    }*/
 }

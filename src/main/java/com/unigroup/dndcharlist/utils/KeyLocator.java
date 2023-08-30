@@ -36,6 +36,7 @@ public class KeyLocator implements SigningKeyResolver {
 
     @Autowired
     GoogleKeyKeeper googleKeyKeeper;
+
     private String ownSecret = "984hg493gh0439rthr0429uruj2309yh937gc763fe87t3f89723gf";
 
     public String getOwnSecret() {

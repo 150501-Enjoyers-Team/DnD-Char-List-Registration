@@ -4,12 +4,9 @@ import com.unigroup.dndcharlist.dtos.JwtRequest;
 import com.unigroup.dndcharlist.dtos.RegistrationUserDto;
 import com.unigroup.dndcharlist.services.AuthService;
 import com.unigroup.dndcharlist.utils.JwtTokenUtils;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +19,12 @@ import java.security.GeneralSecurityException;
 @RestController
 @Slf4j
 public class AuthController {
+
     private final AuthService authService;
+
     @Autowired
     private JwtTokenUtils jwtTokenUtils;
+
     @Autowired
     public AuthController(AuthService authService) {
         this.authService = authService;
