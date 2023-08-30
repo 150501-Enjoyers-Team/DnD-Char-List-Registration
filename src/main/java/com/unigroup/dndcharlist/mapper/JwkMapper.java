@@ -11,6 +11,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.HashMap;
 
 public class JwkMapper {
+
     public static PublicKey mapToRSAPublicKey (HashMap<String, String> jwkKey ) {
         Base64 decoder = new Base64(true);
         BigInteger mod = new BigInteger(1, decoder.decode(jwkKey.get("n")));
