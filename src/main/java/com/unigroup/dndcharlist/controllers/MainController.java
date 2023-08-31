@@ -23,7 +23,7 @@ public class MainController {
     private final UserService userService;
 
     @GetMapping("/unsecured")
-    public String unsecuredData(String token) {
+    public String unsecuredData() {
         return "Unsecured data";
     }
 

@@ -8,12 +8,8 @@ import com.unigroup.dndcharlist.entities.User;
 import com.unigroup.dndcharlist.exceptions.AppError;
 import com.unigroup.dndcharlist.utils.JwtTokenUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @Service
@@ -46,27 +41,22 @@ public class AuthService {
         return ResponseEntity.ok(new JwtResponse(accessToken, refreshToken));
     }
 
-    public void createRefreshToken(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, GeneralSecurityException {
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String username = null;
-        String refreshToken = null;
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
-        }
-        refreshToken = authHeader.substring(7);
+    public JwtResponse refreshAccessToken(String refreshToken)
+            throws GeneralSecurityException {
+        String username;
+        JwtResponse response = null;
         username = jwtTokenUtils.getUsername(refreshToken);
         if (username != null) {
             var user = userService.loadUserByUsername(username);
             if(jwtTokenUtils.isTokenValid(refreshToken, user)) {
-                var accessToken = jwtTokenUtils.generateToken((UserDetails) user);
-                var authResponse = JwtResponse.builder()
+                String accessToken = jwtTokenUtils.generateToken(user);
+                response = JwtResponse.builder()
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+        return response;
     }
 
     public ResponseEntity<?> createNewUser(@RequestBody RegistrationUserDto registrationUserDto) {

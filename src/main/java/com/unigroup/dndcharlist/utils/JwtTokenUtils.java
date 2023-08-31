@@ -2,10 +2,8 @@ package com.unigroup.dndcharlist.utils;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.unigroup.dndcharlist.entities.User;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,8 +26,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtTokenUtils {
 
-    private KeyLocator keyLocator;
-    private JwtParser jwtParser;
+    private final KeyLocator keyLocator;
+    private final JwtParser jwtParser;
 
     @Autowired
     public JwtTokenUtils(KeyLocator locator) {
@@ -55,7 +53,8 @@ public class JwtTokenUtils {
 
     private String buildToken(UserDetails userDetails, long expiration) {
         Map<String, Object> claims = new HashMap<>();
-        List<String> rolesList = userDetails.getAuthorities().stream()
+        List<String> rolesList = userDetails.getAuthorities()
+                .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         claims.put("roles", rolesList);
@@ -90,8 +89,8 @@ public class JwtTokenUtils {
 
     public String getUsername(String token) throws GeneralSecurityException {
         String username = null;
-        Claims claims = null;
-        String issuer = null;
+        Claims claims;
+        String issuer;
         try {
             claims = getAllClaimsFromJwt(token);
             issuer = getIssuer(token);

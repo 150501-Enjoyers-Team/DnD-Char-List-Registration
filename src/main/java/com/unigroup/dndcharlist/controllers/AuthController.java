@@ -1,18 +1,17 @@
 package com.unigroup.dndcharlist.controllers;
 
 import com.unigroup.dndcharlist.dtos.JwtRequest;
+import com.unigroup.dndcharlist.dtos.JwtResponse;
 import com.unigroup.dndcharlist.dtos.RegistrationUserDto;
+import com.unigroup.dndcharlist.exceptions.AppError;
 import com.unigroup.dndcharlist.services.AuthService;
 import com.unigroup.dndcharlist.utils.JwtTokenUtils;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @CrossOrigin(origins = "*")
@@ -41,16 +40,21 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, GeneralSecurityException {
-        authService.createRefreshToken(request, response);
+    public ResponseEntity<?> refreshAccessToken(String refreshToken) throws GeneralSecurityException {
+        JwtResponse response = authService.refreshAccessToken(refreshToken);
+        if(response == null)
+            return new ResponseEntity<>(new AppError(HttpStatus.NO_CONTENT.value(),
+                    "can't get new access token"), HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/get/username")
     public ResponseEntity<?> getUsernameFromToken(String token) throws GeneralSecurityException {
-        String username = null;
+        String username;
         username = jwtTokenUtils.getUsername(token);
         if(username == null)
-            return new ResponseEntity<>("can't extract username", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new AppError(HttpStatus.NO_CONTENT.value(),
+                    "can't extract username"), HttpStatus.NO_CONTENT);
         return ResponseEntity.ok(username);
     }
 }
